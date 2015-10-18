@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>610</width>
-    <height>497</height>
+    <width>767</width>
+    <height>593</height>
    </rect>
   </property>
   <property name="palette">
@@ -432,8 +432,8 @@
    <widget class="QPushButton" name="btnCancel">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>340</y>
+      <x>480</x>
+      <y>500</y>
       <width>96</width>
       <height>31</height>
      </rect>
@@ -482,8 +482,8 @@
    <widget class="QPushButton" name="btnUpdate">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>340</y>
+      <x>630</x>
+      <y>500</y>
       <width>96</width>
       <height>31</height>
      </rect>
@@ -582,7 +582,7 @@
    <widget class="QLabel" name="lblTitle">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>90</x>
       <y>0</y>
       <width>541</width>
       <height>21</height>
@@ -604,9 +604,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>390</y>
-      <width>571</width>
-      <height>31</height>
+      <y>460</y>
+      <width>451</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="font">
@@ -619,13 +619,16 @@
     <property name="text">
      <string>...</string>
     </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="lblVersion">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>10</y>
-      <width>71</width>
+      <x>680</x>
+      <y>0</y>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -637,7 +640,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>350</y>
       <width>561</width>
       <height>31</height>
      </rect>
@@ -656,10 +659,10 @@
    <widget class="QGroupBox" name="groupFavourites">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>190</y>
-      <width>421</width>
-      <height>71</height>
+      <x>150</x>
+      <y>140</y>
+      <width>231</width>
+      <height>151</height>
      </rect>
     </property>
     <property name="title">
@@ -671,7 +674,7 @@
     <widget class="QPushButton" name="btnFavourite1">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>30</y>
        <width>51</width>
        <height>26</height>
@@ -684,7 +687,7 @@
     <widget class="QPushButton" name="btnFavourite2">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>30</y>
        <width>51</width>
        <height>26</height>
@@ -697,7 +700,7 @@
     <widget class="QPushButton" name="btnFavourite3">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>160</x>
        <y>30</y>
        <width>51</width>
        <height>26</height>
@@ -710,8 +713,8 @@
     <widget class="QPushButton" name="btnFavourite4">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>30</y>
+       <x>20</x>
+       <y>70</y>
        <width>51</width>
        <height>26</height>
       </rect>
@@ -723,8 +726,8 @@
     <widget class="QPushButton" name="btnFavourite5">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>30</y>
+       <x>90</x>
+       <y>70</y>
        <width>51</width>
        <height>26</height>
       </rect>
@@ -736,8 +739,47 @@
     <widget class="QPushButton" name="btnFavourite6">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>30</y>
+       <x>160</x>
+       <y>70</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnFavourite8">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>110</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnFavourite9">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>110</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnFavourite7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
        <width>51</width>
        <height>26</height>
       </rect>
@@ -750,7 +792,7 @@
    <widget class="QGroupBox" name="groupOptions">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>100</x>
       <y>40</y>
       <width>551</width>
       <height>80</height>
@@ -871,7 +913,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>280</y>
+      <y>320</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -882,6 +924,61 @@
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupProfileColours">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>130</y>
+      <width>231</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Profile colours</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QPushButton" name="btnM1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>M1</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnM2">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>M2</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnM3">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>20</y>
+       <width>51</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>M3</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">

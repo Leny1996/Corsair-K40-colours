@@ -58,6 +58,10 @@ private slots:
     void on_btnFavourite8_clicked();
     void on_btnFavourite9_clicked();
 
+    void on_btnM1_clicked();
+    void on_btnM2_clicked();
+    void on_btnM3_clicked();
+
     void on_btnCancel_clicked();
     void on_btnUpdate_clicked();
 

@@ -41,12 +41,27 @@
 
 // 18 October 2015
 // Not hanging now. Added current colours to the profile buttons and the combobox.
-// Some colours are not the same as the keyboard but k50-set-colour and my app
+// Some colours are not the same as the keyboard but k40-set-colour and my app
 // give the same results. Makes one wonder what the mode of 'thue colour' does.
+
+// 19 October 2015
+// This is now on github and updated as of last night. Moved the keyboard to my
+// laptop where I can test it using Windows 10. It has the same 'feature' in
+// the difference between the colours displayed on the screen and the ones on
+// the keyboard. The 'hardware playback' and 'light fx' do something in Windows.
+// Will see if I can replicate them.
+
+// Used Logman on my laptop Windows 10 and traced USB3. There were too many events
+// and without some sort of mapping, I've got other things to do. So will only make
+// a few attempts of replicating the hardware playback.
+
+// After a couple dozen tests, this seems stable. Have removed most of the
+// tracing (qDebug) and changed the version to beta 1.
+
+
 
 
 // TODO
-// create a daemon so app can run in user mode.
 
 
 
@@ -69,7 +84,7 @@
 //#include <libusb-1.0/libusb.h>
 //}
 
-QString version  = "a10";
+QString version  = "b1";
 
 #define CORSAIR_ID	0x1b1c
 #define CORSAIR_K40_ID	0x1b0e
@@ -79,13 +94,19 @@ QString version  = "a10";
 #define REQUEST_STATUS	4
 #define REQUEST_STATUS_EXTENDED	5
 #define REQUEST_SWITCH_PROFILE	20
-#define REQUEST_SET_ANIM	49
-#define REQUEST_SET_COLOR_CONTROL	50
+#define REQUEST_SET_ANIMATION	49
+#define REQUEST_SET_COLOUR_CONTROL	50
 #define REQUEST_SET_COLOUR	51
-#define REQUEST_SET_COLOR_MODE	56
+#define REQUEST_CYCLE_COLOURS	52
+#define REQUEST_SET_COLOUR_MODE	56
 
 #define COLOR_CONTROL_SW	0x0600
 #define COLOR_CONTROL_HW	0x0a00
+#define COLOR_MODE_TRUE_COLOUR	0
+#define COLOR_MODE_MAX_BRIGHTNESS	1
+#define ANIMATION_OFF 0
+#define ANIMATION_PULSE 1
+#define ANIMATION_CYCLE 2
 
 
 // uint8_t  = unsigned char
@@ -153,8 +174,8 @@ MainWindow::MainWindow(QWidget *parent) :
   }
 
   //
-  colourModeMap.insert("True Colour", 0);
-  colourModeMap.insert("Max Brightness", 1);
+  colourModeMap.insert("True Colour", COLOR_MODE_TRUE_COLOUR);
+  colourModeMap.insert("Max Brightness", COLOR_MODE_MAX_BRIGHTNESS);
   QMapIterator<QString, uint16_t> colourModeIterator(colourModeMap);
 
   while (colourModeIterator.hasNext()) {
@@ -164,9 +185,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
   // create animationMap in value sequence so that 'Off' comes first
-  animationMap.insert(0, "Off");
-  animationMap.insert(1, "Pulse");
-  animationMap.insert(2, "Cycle");
+  animationMap.insert(ANIMATION_OFF, "Off");
+  animationMap.insert(ANIMATION_PULSE, "Pulse");
+  animationMap.insert(ANIMATION_CYCLE, "Cycle");
   QMapIterator<uint16_t, QString> animationValueIterator(animationMap);
 
   while (animationValueIterator.hasNext()) {
@@ -257,7 +278,6 @@ MainWindow::MainWindow(QWidget *parent) :
     sprintf(colourArray, "#%02hhX%02hhX%02hhX", testArray.colourRed, testArray.colourGreen, testArray.colourBlue );
 
     palettex->setColor(QPalette::Button,QColor(colourArray));
-    qDebug() << "abc";
     setProfileColours(testArray.profile, *palettex);
 
   }  // end of for loop
@@ -288,12 +308,10 @@ void MainWindow::cboProfileChanged(int index) {
   palettex->setColor(QPalette::Button,QColor(colourArray));
   ui->cboProfile->setPalette(*palettex);
 
-  qDebug() << "xay";
   setProfileColours(profile, *palettex);
-}
+}  // end of cboProfileChanged
 
 void MainWindow::setProfileColours(int parsedProfile, QPalette palettex) {
-//  QPalette* palettex = new QPalette();
   switch (parsedProfile) {
     case 1:
       ui->btnM1->setPalette(palettex);
@@ -318,7 +336,7 @@ void MainWindow::cboControlModeChanged(int index) {
 
   ret = libusb_control_transfer (device,
                LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-               REQUEST_SET_COLOR_CONTROL, control, 0,
+               REQUEST_SET_COLOUR_CONTROL, control, 0,
                nullptr, 0, 0);
 
   if (ret < 0) {
@@ -336,7 +354,7 @@ void MainWindow::cboColourModeChanged(int index) {
 
   ret = libusb_control_transfer (device,
                LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-               REQUEST_SET_COLOR_MODE, mode, 0,
+               REQUEST_SET_COLOUR_MODE, mode, 0,
                nullptr, 0, 0);
 
   if (ret < 0) {
@@ -356,7 +374,7 @@ void MainWindow::cboAnimationChanged(int index) {
 
   ret = libusb_control_transfer (device,
                LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-               REQUEST_SET_ANIM, 0, anim,
+               REQUEST_SET_ANIMATION, 0, anim,
                nullptr, 0, 0);
   if (ret < 0) {
     ui->lblDeviceStatus->setText(wrapInRedPrefix + "Failed to set animation:" + libusb_error_name (ret) + wrapInColourSuffix);
@@ -364,6 +382,18 @@ void MainWindow::cboAnimationChanged(int index) {
   }
   fprintf (stderr, "Set animation to 0x%04hX.\n", anim);
   usleep (DELAY);
+
+  // trying different things when animation is set to 'cycle'
+  //  if (anim == ANIMATION_CYCLE) {
+  //    ret = libusb_control_transfer (device,
+  //                 LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
+  //                 REQUEST_CYCLE_COLOURS, 0, anim,
+  //                 nullptr, 0, 0);
+
+  //    usleep (DELAY);
+  //  }
+
+
 }
 
 // ................................................................................... //
@@ -394,7 +424,7 @@ void MainWindow::on_btnSelectColour_clicked() {
   blueColour = newColour.blue();
   greenColour = newColour.green();
   currentColour = QColor(redColour,greenColour, blueColour);
-  qDebug() << "new colour" << "red:" << redColour << "green:" << greenColour << "blue:" << blueColour;
+//  qDebug() << "new colour" << "red:" << redColour << "green:" << greenColour << "blue:" << blueColour;
 }
 
 
@@ -443,6 +473,17 @@ void MainWindow::on_btnFavourite9_clicked() {
   redColour = currentColour.red(); greenColour = currentColour.green(); blueColour = currentColour.blue();
 }
 
+void MainWindow::on_btnM1_clicked() {
+  ui->cboProfile->setCurrentIndex(0);
+}
+
+void MainWindow::on_btnM2_clicked() {
+  ui->cboProfile->setCurrentIndex(1);
+}
+
+void MainWindow::on_btnM3_clicked() {
+  ui->cboProfile->setCurrentIndex(2);
+}
 
 
 void MainWindow::on_btnCancel_clicked() {
@@ -471,24 +512,25 @@ void MainWindow::on_btnUpdate_clicked() {
     ui->lblDeviceStatus->setText(wrapInRedPrefix + "Failed to set colour:" + libusb_error_name (ret) + wrapInColourSuffix);
   }
 
-//  if (profile == 0)
-//    fprintf (stderr, "Set colour %02hhX%02hhX%02hhX.\n", redColour, greenColour, blueColour);
-//  else
-//    fprintf (stderr, "Set colour %02hhX%02hhX%02hhX for profile %d.\n", redColour, greenColour, blueColour, profile);
+  // not going to handle a 0 profile as not sure what it is for
+  if (profile == 0) {
+    ui->lblDeviceStatus->setText(wrapInRedPrefix + "Profile is 0" + wrapInColourSuffix);
+    return;
+  }
 
   sprintf(colourHex, "%02hhX%02hhX%02hhX", redColour, greenColour, blueColour);
   sprintf(colourText, "red: %hhu green: %hhu blue: %hhu set for profile %d", redColour, greenColour, blueColour, profile);
 
   wrapColour =  colourHex;
-  QString wrapString = wrapInColourPrefix1 + wrapColour + wrapInColourPrefix2;
-  ui->lblStatus->setText(wrapString +colourText + wrapInColourSuffix);
+  QString wrapPrefix = wrapInColourPrefix1 + wrapColour + wrapInColourPrefix2;
+  QString theLot = wrapPrefix + colourText + wrapInColourSuffix;
+
 
   // ensure combobox has new colour
   cboProfileChanged(profile-1);
-//  setProfileColour(profile);
+  ui->lblStatus->setText(theLot);
 
-
-}
+}  // end of on_btnUpdate_clicked
 
 
 statusStructure MainWindow::getKeyboardStatus () {
